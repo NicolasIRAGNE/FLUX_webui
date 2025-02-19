@@ -7,6 +7,9 @@ import random
 from PIL import Image
 
 SAVE_PATH = datetime.datetime.now().strftime("%m-%Y")
+# Create a folder to save the images
+if not os.path.exists(SAVE_PATH):
+    os.makedirs(SAVE_PATH)
 
 # Define the function that will generate the image
 def generate_image(prompt, aspect_ratio, image_input_url, image_prompt_strength, raw, seed):
@@ -36,9 +39,6 @@ def generate_image(prompt, aspect_ratio, image_input_url, image_prompt_strength,
     result = handler.get()
     print("Got result")
 
-    # Create a folder to save the images
-    if not os.path.exists(SAVE_PATH):
-        os.makedirs(SAVE_PATH)
 
     # Save and return the first image
     images = []
@@ -64,8 +64,9 @@ prompt_file = "C:/Users/nicor/source/repos/golmon_radio_archives/prompts.md"
 random_prompts = []
 if prompt_file != "":
     # read a random line from the file that is not empty
-    with open(prompt_file, "r", encoding="utf-8") as file:
-        random_prompts = file.readlines()
+    if os.path.exists(prompt_file):
+        with open(prompt_file, "r", encoding="utf-8") as file:
+            random_prompts = file.readlines()
 
 # Load existing images to add to the gallery
 previous_images = []
@@ -112,6 +113,8 @@ def change_lines():
     return gr.update(value=random.choice(random_prompts))
 
 if __name__ == "__main__":
+
+    print("Initializing interface...")
     with gr.Blocks() as interface:
         random_prompt_button = gr.Button("Random Prompt")
         # Define Gradio inputs and outputs
@@ -136,5 +139,5 @@ if __name__ == "__main__":
             description="Generate images based on a textual prompt using FAL Client."
         )
 
-    # interface.launch(server_name="127.0.0.1", server_port=3000)
+    interface.launch(server_name="0.0.0.0", server_port=3000)
     interface.launch()
